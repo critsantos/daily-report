@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Daily Report — UTO</title>
+<style>
+:root{--navy:#1B2A4A;--teal:#006D77;--blue:#2563eb;--blt:#1e3a5f;--bg:#0f172a;--card:#1e293b;--bdr:#334155;--txt:#e2e8f0;--muted:#64748b;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,'Helvetica Neue',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;}
+.hdr{background:linear-gradient(135deg,#1e3a5f,#0f172a);border-bottom:1px solid #1e40af33;padding:14px 16px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:50;}
+.logo{width:38px;height:38px;background:linear-gradient(135deg,#2563eb,#06b6d4);border-radius:9px;display:flex;align-items:center;justify-content:center;font-weight:900;color:#fff;font-size:12px;flex-shrink:0;}
+.main{max-width:800px;margin:0 auto;padding:16px 12px 110px;}
+.card{background:var(--card);border:1px solid var(--bdr);border-radius:14px;padding:16px;margin-bottom:14px;}
+.ctitle{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;}
+label{display:block;font-size:11px;color:var(--muted);margin-bottom:4px;}
+input,select{background:var(--bg);border:1px solid var(--bdr);border-radius:8px;padding:10px 12px;color:var(--txt);font-size:14px;width:100%;outline:none;-webkit-appearance:none;}
+input:focus,select:focus{border-color:var(--blue);}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px;}
+@media(max-width:500px){.g2,.g3{grid-template-columns:1fr;}}
+.btn{display:flex;align-items:center;justify-content:center;gap:6px;padding:12px 18px;border:none;border-radius:10px;font-weight:700;font-size:14px;cursor:pointer;width:100%;-webkit-tap-highlight-color:transparent;}
+.btn:active{opacity:.75;}
+.btn-blue{background:linear-gradient(135deg,#2563eb,#1d4ed8);color:#fff;}
+.btn-green{background:linear-gradient(135deg,#059669,#047857);color:#fff;padding:15px;font-size:15px;}
+.btn-red{background:#450a0a;color:#fca5a5;border:1px solid #7f1d1d;padding:7px 12px;font-size:12px;border-radius:7px;width:auto;}
+.rcard{background:var(--bg);border:1px solid #1e40af44;border-radius:12px;padding:14px;margin-bottom:10px;}
+.rhdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px;}
+.rbadge{background:var(--blt);color:#93c5fd;border-radius:6px;padding:4px 12px;font-size:16px;font-weight:800;}
+.sbadge{border-radius:999px;padding:3px 9px;font-size:11px;font-weight:600;}
+.sAC{background:#1e3a5f;color:#60a5fa;}.sDuct{background:#0d2a1e;color:#4ade80;}.sBoth{background:#2d1b69;color:#a78bfa;}
+.dz{border:2px dashed var(--bdr);border-radius:10px;padding:18px 12px;text-align:center;cursor:pointer;color:var(--muted);font-size:13px;transition:all .2s;}
+.dz.on{border-color:var(--blue);background:#1e3a5f22;}
+.pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:10px;}
+.pthumb{position:relative;aspect-ratio:3/4;border-radius:8px;overflow:hidden;border:1px solid var(--bdr);}
+.pthumb img{width:100%;height:100%;object-fit:cover;display:block;}
+.prem{position:absolute;top:3px;right:3px;background:#450a0a99;border:none;border-radius:4px;color:#fca5a5;cursor:pointer;font-size:12px;padding:2px 6px;}
+.pnum{position:absolute;bottom:3px;left:4px;background:#00000088;border-radius:3px;color:#fff;font-size:9px;padding:1px 4px;}
+.cap{margin-top:8px;font-size:11px;color:var(--muted);}
+.cap span{color:#60a5fa;}
+.bar{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--bdr);padding:10px 16px;z-index:100;}
+.empty{text-align:center;padding:32px 16px;color:var(--muted);font-size:13px;}
+.toast{position:fixed;top:70px;left:50%;transform:translateX(-50%);background:#059669;color:#fff;padding:10px 22px;border-radius:999px;font-size:13px;font-weight:600;z-index:999;opacity:0;pointer-events:none;transition:opacity .3s;white-space:nowrap;}
+.toast.show{opacity:1;}
+.overlay{display:none;position:fixed;inset:0;z-index:200;flex-direction:column;background:#000;}
+.overlay.show{display:flex;}
+.oframe{flex:1;width:100%;border:none;background:#fff;}
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<div class="hdr">
+  <div class="logo">UTO</div>
+  <div style="flex:1;margin-left:8px">
+    <div style="font-weight:700;font-size:15px;color:#f1f5f9">Daily Report Generator</div>
+    <div style="font-size:11px;color:var(--muted)">Eden Residences · UTO Advance Engineering</div>
+  </div>
+</div>
+
+<div class="main">
+  <div class="card">
+    <div class="ctitle">📋 ข้อมูลโครงการ</div>
+    <div class="g3">
+      <div><label>วันที่ (EN)</label><input id="dateEN"></div>
+      <div><label>วันที่ (TH)</label><input id="dateTH"></div>
+      <div><label>Contractor</label><input id="contractor" value="UTO Advance Eng."></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ctitle">🏠 เพิ่มห้อง
+      <span style="color:#475569;font-size:10px;font-weight:400;text-transform:none">
+        (ไม่จำกัดห้อง · 18 รูป/ห้อง · Floor &amp; Room Type อัตโนมัติ)
+      </span>
+    </div>
+    <div class="g2" style="margin-bottom:10px">
+      <div>
+        <label>เลขห้อง</label>
+        <input id="newRN" placeholder="E206" style="font-size:18px;font-weight:700;text-transform:uppercase"
+          oninput="this.value=this.value.toUpperCase();prvw()"
+          onkeydown="if(event.key==='Enter')addRoom()">
+        <div id="prvwTxt" style="font-size:11px;color:#60a5fa;margin-top:4px;min-height:16px"></div>
+      </div>
+      <div>
+        <label>ระบบ</label>
+        <select id="newSys">
+          <option value="AC">🔵 AC VRV</option>
+          <option value="Duct">🟢 PID Duct</option>
+          <option value="Both">⚡ AC + Duct</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn btn-blue" onclick="addRoom()">＋ เพิ่มห้อง</button>
+    <div id="rList" style="margin-top:14px"></div>
+  </div>
+</div>
+
+<div class="bar" id="bar" style="display:none">
+  <div style="font-weight:700;font-size:13px;margin-bottom:2px" id="bTxt"></div>
+  <div style="font-size:11px;color:var(--muted);margin-bottom:8px" id="bRooms"></div>
+  <button class="btn btn-green" onclick="generate()">📄 Generate PDF</button>
+</div>
+
+<div class="overlay" id="overlay">
+  <iframe id="oframe" class="oframe"></iframe>
+</div>
+
+<script>
+const RT={"01":"1B Type 1","02":"1B Type 1","03":"1B Type 2","04":"3B Type 3","05":"2B Type 1","06":"2B Type 1","07":"2B Type 1","08":"1B Type 2B","09":"1B Type 1"};
+const CAP={AC:"AC System Installation — On Progress",Duct:"PID Duct Installation — On Progress",Both:"AC + PID Duct Installation — On Progress"};
+const SL={AC:"AC VRV",Duct:"PID Duct",Both:"AC+Duct"};
+const MAX=18, COLS=3, PPP=9; // 3 cols × 3 rows = 9 per page
+
+let rooms=[],rid=0;
+
+function rtype(r){return RT[r.replace(/[^0-9]/g,"").slice(-2)]||"—";}
+function flr(r){const d=r.replace(/[^0-9]/g,"")[0];return d?"Floor "+d:"—";}
+
+(()=>{
+  const d=new Date();
+  const D=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  const M=["January","February","March","April","May","June","July","August","September","October","November","December"];
+  const dd=String(d.getDate()).padStart(2,"0"),mm=String(d.getMonth()+1).padStart(2,"0"),yy=String(d.getFullYear()).slice(2);
+  document.getElementById("dateEN").value=`${D[d.getDay()]} ${d.getDate()} ${M[d.getMonth()]} ${d.getFullYear()}`;
+  document.getElementById("dateTH").value=`${dd} / ${mm} / ${yy}`;
+})();
+
+function prvw(){
+  const rn=document.getElementById("newRN").value.toUpperCase();
+  document.getElementById("prvwTxt").textContent=rn.length>=3?rtype(rn)+" · "+flr(rn):"";
+}
+function addRoom(){
+  const rn=document.getElementById("newRN").value.toUpperCase().trim();
+  if(!rn){toast("⚠️ กรอกเลขห้องก่อน");return;}
+  const sys=document.getElementById("newSys").value;
+  rooms.push({id:++rid,roomNo:rn,roomType:rtype(rn),floor:flr(rn),system:sys,photos:[]});
+  document.getElementById("newRN").value="";
+  document.getElementById("prvwTxt").textContent="";
+  render();updateBar();toast("✅ เพิ่ม "+rn);
+}
+function removeRoom(id){rooms=rooms.filter(r=>r.id!==id);render();updateBar();}
+function chSys(id,s){const r=rooms.find(r=>r.id===id);if(r){r.system=s;render();}}
+function addPhotos(id,files){
+  const room=rooms.find(r=>r.id===id);if(!room)return;
+  const left=MAX-room.photos.length;
+  if(left<=0){toast("⚠️ ครบ "+MAX+" รูปแล้ว");return;}
+  const arr=Array.from(files).slice(0,left);let n=0;
+  arr.forEach(f=>{
+    const fr=new FileReader();
+    fr.onload=e=>{
+      room.photos.push({id:Date.now()+Math.random(),src:e.target.result});
+      n++;if(n===arr.length){render();updateBar();}
+    };
+    fr.readAsDataURL(f);
+  });
+}
+function remPhoto(rid,pid){
+  const r=rooms.find(r=>r.id===rid);
+  if(r){r.photos=r.photos.filter(p=>p.id!==pid);render();updateBar();}
+}
+function render(){
+  const el=document.getElementById("rList");
+  if(!rooms.length){
+    el.innerHTML=`<div class="empty">🏗️<br><br>ยังไม่มีห้อง<br>กรอกเลขห้องแล้วกด เพิ่มห้อง</div>`;return;
+  }
+  el.innerHTML=rooms.map(r=>`
+    <div class="rcard">
+      <div class="rhdr">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <span class="rbadge">${r.roomNo}</span>
+          <span style="font-size:11px;color:var(--muted)">${r.roomType} · ${r.floor}</span>
+          <span class="sbadge s${r.system}">${SL[r.system]}</span>
+          <span style="font-size:11px;color:var(--muted)">${r.photos.length}/${MAX}</span>
+        </div>
+        <div style="display:flex;gap:6px;align-items:center">
+          <select onchange="chSys(${r.id},this.value)"
+            style="background:var(--card);border:1px solid var(--bdr);border-radius:6px;padding:5px 8px;color:var(--txt);font-size:11px;width:auto">
+            <option value="AC"${r.system==="AC"?" selected":""}>AC VRV</option>
+            <option value="Duct"${r.system==="Duct"?" selected":""}>PID Duct</option>
+            <option value="Both"${r.system==="Both"?" selected":""}>AC+Duct</option>
+          </select>
+          <button class="btn btn-red" onclick="removeRoom(${r.id})">✕</button>
+        </div>
+      </div>
+      <div class="dz" onclick="document.getElementById('fi${r.id}').click()"
+        ondragover="event.preventDefault();this.classList.add('on')"
+        ondragleave="this.classList.remove('on')"
+        ondrop="event.preventDefault();this.classList.remove('on');addPhotos(${r.id},event.dataTransfer.files)">
+        <div style="font-size:24px;margin-bottom:6px">📸</div>
+        <div>แตะเพื่อเลือกรูป</div>
+        <div style="font-size:11px;margin-top:3px;opacity:.6">เหลือ ${MAX-r.photos.length} จาก ${MAX} รูป</div>
+      </div>
+      <input type="file" id="fi${r.id}" multiple accept="image/*" style="display:none"
+        onchange="addPhotos(${r.id},this.files);this.value=''">
+      ${r.photos.length?`<div class="pgrid">${r.photos.map((p,i)=>`
+        <div class="pthumb">
+          <img src="${p.src}" loading="lazy">
+          <button class="prem" onclick="remPhoto(${r.id},${p.id})">✕</button>
+          <span class="pnum">${i+1}</span>
+        </div>`).join("")}</div>`:""}
+      <div class="cap">Caption: <span>${CAP[r.system]}</span></div>
+    </div>`).join("");
+}
+function updateBar(){
+  const b=document.getElementById("bar");
+  const tp=rooms.reduce((a,r)=>a+r.photos.length,0);
+  if(rooms.length){
+    b.style.display="block";
+    document.getElementById("bTxt").textContent=`✅ ${rooms.length} ห้อง · ${tp} รูป`;
+    document.getElementById("bRooms").textContent=rooms.map(r=>`${r.roomNo}(${r.system})`).join(" · ");
+  } else b.style.display="none";
+}
+function toast(msg){
+  const t=document.getElementById("toast");
+  t.textContent=msg;t.classList.add("show");
+  clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove("show"),2200);
+}
+
+// ── photo cell: 3:4 portrait, contain (no crop) ──────────────────────────
+function photoCell(p, cap){
+  return `<td style="width:33.33%;padding:4px;vertical-align:top">
+    <div style="border:1.5px solid #006D77;border-radius:5px;overflow:hidden">
+      <div style="background:#006D77;color:#fff;padding:3px 5px;font-size:5.5pt;font-weight:700;text-align:center;line-height:1.3">${cap}</div>
+      <div style="position:relative;width:100%;padding-top:133%;background:#f0f0f0;overflow:hidden">
+        <img src="${p.src}" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:contain;background:#f0f0f0;">
+      </div>
+    </div>
+  </td>`;
+}
+
+function buildRoomPages(r, info, startPage, totalPages){
+  const cap=CAP[r.system];
+  const chunks=[];
+  for(let i=0;i<r.photos.length;i+=PPP) chunks.push(r.photos.slice(i,i+PPP));
+  if(!chunks.length) chunks.push([]);
+
+  return chunks.map((chunk,ci)=>{
+    const pageNum=startPage+ci;
+    const suffix=chunks.length>1?` (${ci+1}/${chunks.length})`:"";
+    let rows="";
+    for(let i=0;i<chunk.length;i+=COLS){
+      const row=chunk.slice(i,i+COLS);
+      rows+=`<tr>`;
+      row.forEach((p,pi)=>{
+        const gIdx=ci*PPP+i+pi;
+        const isFirst=pageNum===startPage&&gIdx===0;
+        const c=isFirst?`Room Sign ${r.roomNo} — Building E, ${r.floor}`:cap;
+        rows+=photoCell(p,c);
+      });
+      // fill empty cells
+      for(let e=row.length;e<COLS;e++) rows+=`<td style="width:33.33%;padding:4px"></td>`;
+      rows+=`</tr>`;
+    }
+    return `
+    <div style="page-break-before:always;font-family:Arial,sans-serif;color:#000;min-height:257mm;display:flex;flex-direction:column">
+      <div style="background:#1B2A4A;color:#fff;padding:7px 14px;display:flex;justify-content:space-between;align-items:center">
+        <span style="font-weight:700;font-size:9pt">UTO ADVANCE ENGINEERING — Daily Progress Report | ${info.dateEN}</span>
+        <span style="background:#2563eb;padding:2px 9px;border-radius:4px;font-size:8.5pt;font-weight:700">Page ${pageNum} / ${totalPages}</span>
+      </div>
+      <div style="padding:2px 14px;font-size:6.5pt;color:#555;border-bottom:1px solid #e2e8f0">
+        Eden Residence | Building E | ${r.floor} | Room ${r.roomNo} | ${r.system==="AC"?"AC VRV":r.system==="Duct"?"PID Duct":"AC+Duct"} System
+      </div>
+      <div style="background:#006D77;color:#fff;padding:6px 14px;text-align:center;font-weight:700;font-size:10.5pt">
+        Room ${r.roomNo} — Building E, ${r.floor} | ${r.photos.length} Photos${suffix} | ${info.dateEN}
+      </div>
+      <div style="padding:6px 10px;flex:1">
+        <table style="width:100%;border-collapse:collapse">${rows}</table>
+      </div>
+      <div style="border-top:1px solid #e2e8f0;padding:3px 14px;display:flex;justify-content:space-between;font-size:6.5pt;color:#999">
+        <span>UTO ADVANCE ENGINEERING | Daily Report | Eden Residence | ${info.dateTH}</span>
+        <span>Page ${pageNum} / ${totalPages}</span>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+function generate(){
+  if(!rooms.length){toast("⚠️ เพิ่มห้องก่อน");return;}
+  toast("⏳ กำลังสร้าง...");
+
+  const info={
+    dateEN:document.getElementById("dateEN").value,
+    dateTH:document.getElementById("dateTH").value,
+    contractor:document.getElementById("contractor").value,
+  };
+  const floors=[...new Set(rooms.map(r=>r.floor))].sort().join(" & ");
+  const totalPh=rooms.reduce((a,r)=>a+r.photos.length,0);
+  const ppr=rooms.map(r=>Math.max(1,Math.ceil(r.photos.length/PPP)));
+  const totalPages=1+ppr.reduce((a,b)=>a+b,0);
+
+  const coverRows=rooms.map((r,i)=>`
+    <tr>
+      <td style="background:#1B2A4A;color:#fff;font-weight:700;padding:7px 10px;font-size:11pt;width:42px">${String(i+1).padStart(2,"0")}</td>
+      <td style="padding:7px 10px;border-bottom:1px solid #eee">
+        <div style="font-weight:700;font-size:10pt">${r.roomNo} — ${r.system==="AC"?"AC System Installation":r.system==="Duct"?"PID Duct Installation":"AC + PID Duct Installation"}</div>
+        <div style="font-size:8pt;color:#666;margin-top:2px">Room ${r.roomNo} | ${r.floor} | ${r.roomType} | ${r.photos.length} Photos</div>
+      </td>
+    </tr>`).join("");
+
+  const cover=`
+    <div style="font-family:Arial,sans-serif;min-height:257mm;display:flex;flex-direction:column;position:relative">
+      <div style="background:#1B2A4A;padding:16px 20px;color:#fff">
+        <div style="font-size:13pt;font-weight:900">UTO ADVANCE ENGINEERING CO., LTD.</div>
+        <div style="font-size:15pt;font-weight:700;color:#7dd3fc;margin:4px 0">Daily Progress Report</div>
+        <div style="font-size:9pt;color:#94a3b8">Eden Residence | Building E | ${floors}</div>
+        <div style="position:absolute;right:20px;top:16px;text-align:right">
+          <div style="font-weight:700;color:#fff;font-size:11pt">${info.dateEN}</div>
+          <div style="color:#7dd3fc;font-size:9pt">${info.dateTH}</div>
+        </div>
+      </div>
+      <div style="padding:14px 20px;flex:1">
+        <table style="width:100%;border:1px solid #ddd;margin-bottom:12px;border-collapse:collapse">
+          <tr>
+            <td style="background:#006D77;color:#fff;padding:6px 10px;font-size:8pt;width:90px">Project</td>
+            <td style="padding:6px 10px;font-weight:700;font-size:11pt">Eden Residence</td>
+            <td style="background:#006D77;color:#fff;padding:6px 10px;font-size:8pt;width:110px">Building / Floor</td>
+            <td style="padding:6px 10px;font-weight:700;font-size:11pt">Building E / ${floors}</td>
+          </tr>
+          <tr style="background:#f8fafc">
+            <td style="background:#006D77;color:#fff;padding:6px 10px;font-size:8pt">Floor</td>
+            <td style="padding:6px 10px;font-weight:700;font-size:11pt">${floors}</td>
+            <td style="background:#006D77;color:#fff;padding:6px 10px;font-size:8pt">Contractor</td>
+            <td style="padding:6px 10px;font-weight:700;font-size:11pt">${info.contractor}</td>
+          </tr>
+        </table>
+        <div style="background:#006D77;color:#fff;padding:7px 10px;font-weight:700;font-size:10pt">DAILY WORK SUMMARY</div>
+        <table style="width:100%;border:1px solid #ddd;margin-bottom:12px;border-collapse:collapse">${coverRows}</table>
+        <div style="background:#e2e8f0;padding:7px 10px;font-size:9pt;font-weight:600;border:1px solid #ddd">
+          Total Pages: ${totalPages} | Total Photos: ${totalPh} | ${rooms.length} Rooms (${rooms.map(r=>r.roomNo).join(", ")})
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px">
+          ${["Reported By","Approved By"].map(l=>`
+          <div style="border:1px solid #ddd;padding:12px;background:#fafafa;border-radius:4px">
+            <div style="font-weight:700;font-size:9pt;color:#006D77;margin-bottom:8px">${l}</div>
+            <div style="font-size:8.5pt;line-height:2.4;color:#333">Name : _______________________<br>Date : ___/___/______</div>
+          </div>`).join("")}
+        </div>
+      </div>
+      <div style="border-top:1px solid #ddd;padding:4px 20px;font-size:7pt;color:#999">
+        UTO ADVANCE ENGINEERING | Daily Report | Eden Residence | ${info.dateTH} &nbsp; Page 1 / ${totalPages}
+      </div>
+    </div>`;
+
+  let cur=2;
+  const rHTML=rooms.map((r,i)=>{
+    const h=buildRoomPages(r,info,cur,totalPages);
+    cur+=ppr[i];return h;
+  }).join("");
+
+  const fullHTML=`<!DOCTYPE html><html><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Daily Report ${info.dateTH}</title>
+    <style>
+      *{box-sizing:border-box;}
+      body{margin:0;font-family:Arial,sans-serif;background:#fff;}
+      @page{size:A4 portrait;margin:8mm;}
+      .toolbar{position:fixed;top:0;left:0;right:0;background:#1B2A4A;padding:10px 16px;display:flex;gap:10px;align-items:center;z-index:999;}
+      .tb-title{color:#7dd3fc;font-weight:700;font-size:14px;flex:1;}
+      .tb-btn{border:none;border-radius:8px;padding:9px 20px;font-weight:700;font-size:14px;cursor:pointer;}
+      .tb-print{background:linear-gradient(135deg,#059669,#047857);color:#fff;}
+      .tb-close{background:#334155;color:#e2e8f0;}
+      .content{padding-top:52px;}
+      @media print{
+        *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important;}
+        *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important;}
+        .toolbar{display:none!important;}
+        .content{padding-top:0!important;}
+      }
+    </style></head><body>
+    <div class="toolbar">
+      <span class="tb-title">📄 Daily Report — ${info.dateTH}</span>
+      <button class="tb-btn tb-close" onclick="window.parent.document.getElementById('overlay').classList.remove('show')">✕ ปิด</button>
+      <button class="tb-btn tb-print" onclick="window.print()">🖨️ Print / Save PDF</button>
+    </div>
+    <div class="content">${cover}${rHTML}</div>
+    </body></html>`;
+
+  const iframe=document.getElementById("oframe");
+  iframe.srcdoc=fullHTML;
+  document.getElementById("overlay").classList.add("show");
+  setTimeout(()=>toast("✅ พร้อมแล้ว — กด Print / Save PDF"),500);
+}
+
+render();
+</script>
+</body>
+</html>
